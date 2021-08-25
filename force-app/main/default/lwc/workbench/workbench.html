@@ -1,0 +1,17 @@
+<template>
+    <lightning-combobox name="sObject" label="Object" value={value} placeholder="Select Object" options={options}
+        onchange={handleChange}></lightning-combobox>
+
+    <!-- <p>Selected value is: {value}</p> -->
+
+    <lightning-dual-listbox name="Fields" label="Select Fields" source-label="Available" selected-label="Selected"
+        field-level-help="Select fields to get result" options={FieldOptions} onchange={handleFieldChange}>
+    </lightning-dual-listbox>
+
+    <lightning-textarea name="Query Text" readonly value={queryText} label="Query Text: " ></lightning-textarea>
+
+    <lightning-button variant="success" label="Query" title="Query Result" onclick={getResult}
+        class="slds-m-left_x-small"></lightning-button>
+
+
+</template>
