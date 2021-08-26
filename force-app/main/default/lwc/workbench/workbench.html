@@ -5,13 +5,18 @@
     <!-- <p>Selected value is: {value}</p> -->
 
     <lightning-dual-listbox name="Fields" label="Select Fields" source-label="Available" selected-label="Selected"
-        field-level-help="Select fields to get result" options={FieldOptions} onchange={handleFieldChange}>
+        field-level-help="Select fields to get result" value={_selected} options={FieldOptions}  onchange={handleFieldChange}>
     </lightning-dual-listbox>
 
-    <lightning-textarea name="Query Text" readonly value={queryText} label="Query Text: " ></lightning-textarea>
+    <lightning-textarea name="Query Text" readonly value={queryText} label="Query Text: "></lightning-textarea>
 
-    <lightning-button variant="success" label="Query" title="Query Result" onclick={getResult}
+    <lightning-button variant="success" label="Query" title="Query Result" onclick={getResult} disabled={disableButton}
         class="slds-m-left_x-small"></lightning-button>
+
+    <div style="height: 300px;">
+        <lightning-datatable key-field="id" data={data} columns={columns}>
+        </lightning-datatable>
+    </div>
 
 
 </template>

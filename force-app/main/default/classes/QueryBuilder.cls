@@ -29,19 +29,20 @@ public with sharing class QueryBuilder {
       return fieldNames;
     }
     @AuraEnabled(cacheable=true)
-    public static List<List<String>> getQueryResults(
+    public static List<sObject> getQueryResults(
       String query,
       List<String> selectedValues
     ) {
-      List<List<String>> response = new List<List<String>>();
+      List<sObject> response = new List<sObject>();
       List<sObject> queryResult = Database.query(query);
-      for (sObject i : queryResult) {
-        List<String> sObjectFieldValues = new List<String>();
-        for (String j : selectedValues) {
-          sObjectFieldValues.add(String.valueof(i.get(j)));
-        }
-        response.add(sObjectFieldValues);
-      }
+    //   for (sObject i : queryResult) {
+    //     List<String> sObjectFieldValues = new List<String>();
+    //     for (String j : selectedValues) {
+    //       sObjectFieldValues.add(String.valueof(i.get(j)));
+    //     }
+    //     response.add(sObjectFieldValues);
+    //   }
+      response = queryResult;
       return response;
     }
   }

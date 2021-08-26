@@ -1,7 +1,8 @@
-import { LightningElement ,wire} from 'lwc';
+import { LightningElement ,track,wire} from 'lwc';
 import getObjectName from '@salesforce/apex/QueryBuilder.getObjectName';
 import getFields from '@salesforce/apex/QueryBuilder.getFields';
 import getQueryResults from '@salesforce/apex/QueryBuilder.getQueryResults';
+
 
 export default class workbenchLWC extends LightningElement {
     value;
@@ -9,6 +10,19 @@ export default class workbenchLWC extends LightningElement {
     objects = [];
     fields = [];
     queryText = '';
+    @track disableButton=true;
+
+    // get disableButton() {
+    //     return this._disableButton;
+    // }
+
+    _selected = [];
+
+
+    data = [];
+    columns;
+    columnsVar =[]; // to store value in coulmns, we need to create an empty list as columns is not iterable
+
     connectedCallback() {
         getObjectName()
             .then(result => {
@@ -34,7 +48,12 @@ export default class workbenchLWC extends LightningElement {
 
     handleChange(event) {
         this.value = event.detail.value;
-        this.queryText = '';
+        this.fields = []; //rerender
+        this.queryText = ''; //rerender
+        this.columns = []; //rerender
+        this.data = []; //rerender
+        this._selected = []; //rerender
+        this.disableButton = true; //rerender
         getFields({sObjectAPIName : this.value})
             .then(result => {
                 for (let field in result) {
@@ -47,8 +66,7 @@ export default class workbenchLWC extends LightningElement {
             });
     }
 
-    _selected = [];
-
+    
     get FieldOptions() {
         return this.fields;
     }
@@ -59,26 +77,53 @@ export default class workbenchLWC extends LightningElement {
 
     handleFieldChange(e) {
         this._selected = e.detail.value;
-        this.queryText = '';
-        this.queryText += "SELECT ";
-        let selectedValues = this._selected;
-        for (let i = 0; i < selectedValues.length; i++) {
-            if (i == selectedValues.length - 1) {
-                this.queryText += selectedValues[i];
-                break;
+        this.queryText = ''; //rerender
+        this.columns = []; //rerender
+        this.data = []; //rerender
+        if(this._selected.length){
+            this.disableButton = false;
+            this.queryText += "SELECT ";
+            let selectedValues = this._selected;
+            for (let i = 0; i < selectedValues.length; i++) {
+                if (i == selectedValues.length - 1) {
+                    this.queryText += selectedValues[i];
+                    break;
+                }
+                this.queryText += selectedValues[i] + ", ";
             }
-            this.queryText += selectedValues[i] + ", ";
+            this.queryText += " FROM " + this.value;
+        }else{
+            this.disableButton = true;
         }
-        this.queryText += " FROM " + this.value;
+        
     }
 
     clickedButtonLabel;
 
+    
+
     getResult(event) {
         this.clickedButtonLabel = event.target.label;
+        this.columnsVar = []; //rerender
+        this.data = []; //rerender
         getQueryResults({query : this.queryText, selectedValues : this._selected})
         .then(result => {
+            for (let col in this._selected) {
+                this.columnsVar = [...this.columnsVar, { label: this._selected[col], fieldName: this._selected[col] }];
 
+            }
+            this.columns = this.columnsVar;
+            this.data = result;
+            // console.log(result);
+            // for(let i = 0; i < result.length; i++){
+            //     for(let j = 0; j < this._selected.length; j++){
+            //         this.data.add(result[i][j]);
+            //     }
+            // }
         })
     }
+
+    
+
+    // eslint-disable-next-line @lwc/lwc/no-async-await
 }
